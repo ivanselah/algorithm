@@ -1,0 +1,19 @@
+{
+  "name": "opp-master",
+  "version": "1.0.0",
+  "description": "이미 알고있는 객체지향에 대한 정확한 이해와 복습",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ivanselah/algorithm.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ivanselah/algorithm/issues"
+  },
+  "homepage": "https://github.com/ivanselah/algorithm#readme"
+}
