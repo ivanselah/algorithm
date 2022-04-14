@@ -1,3 +1,12 @@
 "use strict";
-console.log('Heldasdlo');
+/**
+ * 객체 : 객체는 기능으로 정의한다.
+ */
+/**
+ * 캡슐화
+ * 데이터 + 관련 기능 묶기
+ * 상세내용을 외부에 감춤
+ * 정보은닉
+ * 외부에 영향 없이 객체 내부 구현 가능
+ */
 //# sourceMappingURL=index.js.map
