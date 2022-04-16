@@ -1,10 +1,3 @@
-/**
- * 상속의 문제점
- * 상속의 깊이가 깊어질 수록 관계가 복잡해짐
- * 다이아몬드상속(📌 타입스크립트 : 하나이상의 상속을 받을 수 없다.)
- * 부모의 수정사항이 발생하면 상속받은 자식들이 모두 영향을 받는다.
- */
-
 {
   type CoffeeCup = {
     shots: number;
@@ -16,13 +9,15 @@
     makeCoffee(shots: number): CoffeeCup;
   }
 
-  interface CommercialCoffeeMaker {
-    makeCoffee(shots: number): CoffeeCup;
-    fillCoffeeBeans(beans: number): void;
-    clean(): void;
+  interface MilkMaker {
+    makeMilk(cup: CoffeeCup): CoffeeCup;
   }
 
-  class MilkWhiskMixer {
+  interface SugarMaker {
+    addSugar(cup: CoffeeCup): CoffeeCup;
+  }
+
+  class MilkWhiskMixer implements MilkMaker {
     private milksteamer() {
       console.log('milk steam! 🥛');
     }
@@ -35,11 +30,11 @@
     }
   }
 
-  class SugarMakeMixer {
+  class SugarMakeMixer implements SugarMaker {
     private getSugar() {
       console.log('getting some sugar .... 🍭');
     }
-    makeSugar(cup: CoffeeCup): CoffeeCup {
+    addSugar(cup: CoffeeCup): CoffeeCup {
       this.getSugar();
       return {
         ...cup,
@@ -48,11 +43,22 @@
     }
   }
 
-  class CoffeeMachine implements CoffeeMaker, CommercialCoffeeMaker {
+  class NoMilk implements MilkMaker {
+    makeMilk(cup: CoffeeCup): CoffeeCup {
+      return cup;
+    }
+  }
+  class NoSugar implements SugarMaker {
+    addSugar(cup: CoffeeCup): CoffeeCup {
+      return cup;
+    }
+  }
+
+  class CoffeeMachine implements CoffeeMaker {
     static BEANS_GRAMM_PER_SHOT: number = 7;
     private coffeeBeans: number = 0;
 
-    constructor(coffeeBeans: number) {
+    constructor(coffeeBeans: number, private milk: MilkMaker, private sugar: SugarMaker) {
       this.coffeeBeans = coffeeBeans;
     }
 
@@ -77,7 +83,6 @@
       console.log('extracting...');
       return {
         shots,
-        hasMilk: false,
       };
     }
     clean() {
@@ -87,47 +92,16 @@
     makeCoffee(shots: number): CoffeeCup {
       this.grindBeans(shots);
       this.preheat();
-      return this.extract(shots);
-    }
-  }
-
-  class CafeLatteMachine extends CoffeeMachine {
-    constructor(beans: number, private milk: MilkWhiskMixer) {
-      super(beans);
-    }
-    makeCoffee(shots: number): CoffeeCup {
-      const coffeecup = super.makeCoffee(shots);
-      return this.milk.makeMilk(coffeecup);
-    }
-  }
-
-  class SweetCoffeeMaker extends CoffeeMachine {
-    constructor(beans: number, private sugar: SugarMakeMixer) {
-      super(beans);
-    }
-    makeCoffee(shots: number): CoffeeCup {
-      const coffee = super.makeCoffee(shots);
-      return this.sugar.makeSugar(coffee);
-    }
-  }
-
-  /**
-   * 클래스를 타입으로 가져갈 경우 커플링이 심함
-   * 확장성 부족 => 해결책 인터페이스
-   */
-  class SweetCaffeLatteMachine extends CoffeeMachine {
-    constructor(beans: number, private milk: MilkWhiskMixer, private sugar: SugarMakeMixer) {
-      super(beans);
-    }
-    makeCoffee(shots: number): CoffeeCup {
-      const coffee = super.makeCoffee(shots);
-      return this.sugar.makeSugar(this.milk.makeMilk(coffee));
+      const coffee = this.extract(shots);
+      return this.sugar.addSugar(this.milk.makeMilk(coffee));
     }
   }
 
   const milkMaker = new MilkWhiskMixer();
   const sugarMaker = new SugarMakeMixer();
+  const noMilk = new NoMilk();
+  const noSugar = new NoSugar();
 
-  const sweetLatte = new SweetCaffeLatteMachine(32, milkMaker, sugarMaker);
-  sweetLatte.makeCoffee(2);
+  const coffee = new CoffeeMachine(40, noMilk, sugarMaker);
+  console.log(coffee.makeCoffee(1));
 }
